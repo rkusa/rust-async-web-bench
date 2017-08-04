@@ -2,9 +2,11 @@
 
 I am comparing the usage of `sync` vs. `async` rust on top of async [`hyper`](https://github.com/hyperium/hyper) (i.e. incoming TCP requests and HTTP parsing is async in both cases - this is not about async hyper vs sync hyper!).
 
-**tl;dr;**: Both approaches work. There are differences and what to use depends — as almost always — on the use case.
+**tl;dr;**: Both approaches work fine, but still have their pros and cons. Writing in a `sync` way, utilizes all CPU cores out of the box. When writing in `async` way, long computations might block the 1 thread that is used. Such computations should be offloaded into another thread (as shown in the `async2` benchmark). Deciding what to offload and what not could be difficult and sometimes not too obvious. The `async` approach really shines when most of the time is used to wait for something like database queries (if the waiting time is low, the improvement compared to `sync` isn't that significant). 
 
-I've build a chatbot (not public) using async Rust. Since the ergonomics of a long and branched async chains is currently (this is expected to improve eventually) really bad and already feels unmaintainable, I've converted the chatbot into using sync APIs ontop of async hyper (by handling requests in a [`CpuPool`](https://github.com/alexcrichton/futures-rs)). I benchmarked both implementations (result is at the end of the README) and the sync one performed – suprisingly – better. However, due to different libraries doing the same (e.g. sync postgres vs, async postgres, sync postgres pool vs, async postgres pool, sync web "framework" vs async web "framework") I am not trusting those benchmarks. This is why I've tried to build a more fair comparison here. The benchmark does not simply return a hello world, instead it involves some simple JSON deserialization, a short calculation and an artifical delay, which acts as a database query replacement.
+work. There are differences and what to use depends — as almost always — on the use case.
+
+I've build a chatbot (not public) using async Rust. Since the ergonomics of a long and branched async chains is currently (this is expected to improve eventually) not good and the codebase already feels hard to maintain, I've converted the chatbot into using sync APIs ontop of async hyper (by handling requests in a [`CpuPool`](https://github.com/alexcrichton/futures-rs)). I benchmarked both implementations (result is at the end of the README) and the sync one performed – suprisingly – better. However, due to different libraries doing the same (e.g. sync postgres vs, async postgres, sync postgres pool vs, async postgres pool, sync web "framework" vs async web "framework") I am not trusting those benchmarks. This is why I've tried to build a more fair comparison here. The benchmark does not simply return a hello world, instead it involves some simple JSON deserialization, a short calculation and an artifical delay, which acts as a database query replacement.
 
 I am open to discussions about the results and also about critic and suggestions of how to improve this benchmark to reflect a real world scenario even more.
 
@@ -79,6 +81,40 @@ As expected, the total time is bound to the toal amount of requests multiplied w
 | async1 | n/a | 20.1549 | 496.1566 |
 | async2 | 32 | 20.1605 | 496.0196 |
 | async2 | 100 | 20.1667 | 495.8673 |
+
+---
+
+The following tests are a little bit more computation intensive due to a more data to be deserialized and processed.
+
+```bash
+hey -m POST -T 'application/json' -D payload-500kb.json -n 10000 -c 100 http://127.0.0.1:3000/
+```
+
+
+**2.9 GHz Intel Core i5 (2 physical cores; macOS); 20ms artifical delay**
+
+| Bench | Pool Size | Total time in sec | Requests/sec |
+| --- | --- | --- | --- |
+| sync | 2 | 84.0310 | 119.0037 |
+| sync | 4 | 71.9833 | 138.9212 |
+| sync | 32 | 72.5779 | 137.7830 |
+| sync | 100 | 77.6445 | 128.7921 |
+| async1 | n/a | 163.7881 | 61.0545 |
+| async2 | 4 | 165.4584 | 60.4381 |
+| async2 | 32 | 151.3932 | 66.0532 |
+| async2 | 100 | 152.5616 | 65.5473 |
+
+**2.9 GHz Intel Core i5 (2 physical cores; macOS); 200ms artifical delay**
+
+| Bench | Pool Size | Total time in sec | Requests/sec |
+| --- | --- | --- | --- |
+| sync | 4 | 570.7808 | 17.5199 |
+| sync | 32 | 79.6164 | 125.6023 |
+| sync | 100 | 78.5469 | 127.3125 |
+| async1 | n/a | 149.2236 | 67.0135 |
+| async2 | 4 | 145.5621 | 68.6992 |
+| async2 | 32 | 149.8404 | 66.7377 |
+| async2 | 100 | 145.5023 | 68.7274 |
 
 ## Chatbot Benchmark Results
 
