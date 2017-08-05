@@ -22,8 +22,6 @@ Some learnings:
 
 ## Benchmark Results
 
-**Note:** The benchmark results will be updated shortly according to [PR#1](https://github.com/rkusa/rust-async-web-bench/pull/1).
-
 The following tests what async is good at. Almost no blocking work (like long running calculations).
 
 ```bash
@@ -36,11 +34,11 @@ hey -m POST -T 'application/json' -d '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
-| sync | 32 | 1.8692 | 5349.7821 |
-| sync | 100 | 2.0110 | 4972.5688 |
-| async1 | n/a | 2.1219 | 4712.8329 |
-| async2 | 32 | 2.3795 | 4202.5000 |
-| async2 | 100 | 2.5816 | 3873.6418 |
+| sync | 32 | 7.2205 | 1384.9543 |
+| sync | 100 | 3.0465 | 3282.4230 |
+| async1 | n/a | 2.5847 | 3868.8641 |
+| async2 | 32 | 2.9412 | 3400.0179 |
+| async2 | 100 | 2.7965 | 3575.8626 |
 
 **2.9 GHz Intel Core i5 (2 physical cores; macOS); 200ms artifical delay**
 
@@ -63,6 +61,9 @@ As expected, the total time is bound to the toal amount of requests multiplied w
 | async1 | n/a | 100.6358 | 99.3682 |
 | async2 | 32 | 100.6814 | 99.3232 |
 | async2 | 100 | 101.3967 | 98.6225 |
+
+
+**Note:** The benchmark results from here on are not yer updated according to [PR#1](https://github.com/rkusa/rust-async-web-bench/pull/1).
 
 **3.5 GHz Intel Core i5-6600K (4 physical cores; Win10); 20ms artifical delay**
 
