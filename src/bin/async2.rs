@@ -4,7 +4,7 @@ extern crate futures_cpupool;
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;
-extern crate tokio_timer;
+extern crate tokio_core;
 
 use futures::future;
 use futures::{Future, Stream};
@@ -12,26 +12,36 @@ use futures_cpupool::CpuPool;
 use hyper::server::{Http, Service, Request, Response};
 use serde_json as json;
 use std::time::Duration;
-use tokio_timer::Timer;
+use tokio_core::net::TcpListener;
+use tokio_core::reactor::{Core, Handle, Timeout};
 
 fn main() {
-    let app = App::new();
+    let mut core = Core::new().unwrap();
+    let handle = core.handle();
+    let app = App::new(&handle);
+    let protocol = Http::new();
 
     let addr = "127.0.0.1:3000".parse().unwrap();
-    let server = Http::new().bind(&addr, move || Ok(app.clone())).unwrap();
-    println!("Listening on http://{}", server.local_addr().unwrap());
-    server.run().unwrap();
+    let listener = TcpListener::bind(&addr, &handle).unwrap();
+    println!("Listening on http://{}", listener.local_addr().unwrap());
+    let server = listener.incoming().for_each(|(socket, addr)| {
+        protocol.bind_connection(&handle, socket, addr, app.clone());
+        Ok(())
+    });
+    core.run(server).unwrap();
 }
 
 #[derive(Clone)]
 struct App {
   pool: CpuPool,
+  handle: Handle,
 }
 
 impl App {
-  fn new() -> Self {
+  fn new(handle: &Handle) -> Self {
     App {
       pool: CpuPool::new(32),
+      handle: handle.clone(),
     }
   }
 }
@@ -45,6 +55,7 @@ impl Service for App
 
     fn call(&self, req: Self::Request) -> Self::Future {
         let pool = self.pool.clone();
+        let timer = self.timer.clone();
         let result = req.body().concat2().map_err(|_| unimplemented!())
         .and_then(move |buffer| {
             // some json deserialization
@@ -54,9 +65,8 @@ impl Service for App
                 future::ok(sum)
             })
         })
-        .and_then(|sum| {
+        .and_then(move |sum| {
             // delay should represent a database query
-            let timer = Timer::default();
             let sleep = timer.sleep(Duration::from_millis(20));
 
             sleep.map_err(|_| unimplemented!()).map(move |_| sum)

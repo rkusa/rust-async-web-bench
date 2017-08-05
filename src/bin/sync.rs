@@ -2,14 +2,13 @@ extern crate async_bench;
 extern crate futures;
 extern crate futures_cpupool;
 extern crate hyper;
-extern crate tokio_timer;
 
 use async_bench::deserialize_body;
 use futures::future::Future;
 use futures_cpupool::{CpuPool, CpuFuture};
 use hyper::server::{Http, Service, Request, Response};
+use std::thread;
 use std::time::Duration;
-use tokio_timer::Timer;
 
 fn main() {
     let app = App::new();
@@ -47,9 +46,7 @@ impl Service for App
             let sum = nums.iter().fold(0, |sum, val| sum + val);
 
             // delay should represent a database query
-            let timer = Timer::default();
-            let sleep = timer.sleep(Duration::from_millis(20));
-            sleep.wait().unwrap();
+            thread::sleep(Duration::from_millis(20));
 
             let res = Response::default().with_body(format!("Sum: {}", sum));
             Ok(res)
