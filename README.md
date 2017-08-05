@@ -22,6 +22,8 @@ Some learnings:
 
 ## Benchmark Results
 
+**Note:** The benchmark results will be updated shortly according to [PR#1](https://github.com/rkusa/rust-async-web-bench/pull/1).
+
 The following tests what async is good at. Almost no blocking work (like long running calculations).
 
 ```bash
