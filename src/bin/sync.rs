@@ -21,19 +21,16 @@ fn main() {
 
 #[derive(Clone)]
 struct App {
-  pool: CpuPool,
+    pool: CpuPool,
 }
 
 impl App {
-  fn new() -> Self {
-    App {
-      pool: CpuPool::new(32),
+    fn new() -> Self {
+        App { pool: CpuPool::new(32) }
     }
-  }
 }
 
-impl Service for App
-{
+impl Service for App {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;

@@ -32,15 +32,12 @@ struct App {
 }
 
 impl App {
-  fn new(handle: &Handle) -> Self {
-    App {
-        handle: handle.clone(),
+    fn new(handle: &Handle) -> Self {
+        App { handle: handle.clone() }
     }
-  }
 }
 
-impl Service for App
-{
+impl Service for App {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
@@ -48,18 +45,18 @@ impl Service for App
 
     fn call(&self, req: Self::Request) -> Self::Future {
         let handle = self.handle.clone();
-        let result = deserialize_body(req.body()).map_err(|_| unimplemented!())
-        .and_then(move |nums| {
-            let sum = nums.iter().fold(0, |sum, val| sum + val);
+        let result = deserialize_body(req.body())
+            .map_err(|_| unimplemented!())
+            .and_then(move |nums| {
+                let sum = nums.iter().fold(0, |sum, val| sum + val);
 
-            // delay should represent a database query
-            let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
-
-            sleep.map_err(|_| unimplemented!()).map(move |_| {
-                let res = Response::default().with_body(format!("Sum: {}", sum));
-                res
-            })
-        });
+                // delay should represent a database query
+                let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
+                sleep.map_err(|_| unimplemented!()).map(move |_| {
+                    let res = Response::default().with_body(format!("Sum: {}", sum));
+                    res
+                })
+            });
 
         Box::new(result)
     }

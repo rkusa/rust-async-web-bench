@@ -6,8 +6,8 @@ extern crate serde;
 extern crate serde_json;
 
 use futures::{Future, Stream};
-use hyper::{Body};
-use serde::de::{DeserializeOwned};
+use hyper::Body;
+use serde::de::DeserializeOwned;
 use serde_json as json;
 
 pub fn deserialize_body(body: Body) -> impl Future<Item = Vec<i64>, Error = Error> {
@@ -17,7 +17,9 @@ pub fn deserialize_body(body: Body) -> impl Future<Item = Vec<i64>, Error = Erro
 pub fn deserialize_json_body<T: DeserializeOwned>(
     body: Body,
 ) -> impl Future<Item = T, Error = Error> {
-    body.concat2().from_err::<Error>().and_then(|buffer| json::from_slice::<T>(&buffer).map_err(Error::from))
+    body.concat2().from_err::<Error>().and_then(|buffer| {
+        json::from_slice::<T>(&buffer).map_err(Error::from)
+    })
 }
 
 #[derive(Debug)]

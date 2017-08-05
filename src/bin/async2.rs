@@ -33,21 +33,20 @@ fn main() {
 
 #[derive(Clone)]
 struct App {
-  pool: CpuPool,
-  handle: Handle,
+    pool: CpuPool,
+    handle: Handle,
 }
 
 impl App {
-  fn new(handle: &Handle) -> Self {
-    App {
-      pool: CpuPool::new(32),
-      handle: handle.clone(),
+    fn new(handle: &Handle) -> Self {
+        App {
+            pool: CpuPool::new(32),
+            handle: handle.clone(),
+        }
     }
-  }
 }
 
-impl Service for App
-{
+impl Service for App {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
@@ -56,24 +55,26 @@ impl Service for App
     fn call(&self, req: Self::Request) -> Self::Future {
         let pool = self.pool.clone();
         let handle = self.handle.clone();
-        let result = req.body().concat2().map_err(|_| unimplemented!())
-        .and_then(move |buffer| {
-            // some json deserialization
-            let nums = json::from_slice::<Vec<i64>>(&buffer).unwrap();
-            pool.spawn_fn(move || {
-                let sum = nums.iter().fold(0, |sum, val| sum + val);
-                future::ok(sum)
+        let result = req.body()
+            .concat2()
+            .map_err(|_| unimplemented!())
+            .and_then(move |buffer| {
+                // some json deserialization
+                let nums = json::from_slice::<Vec<i64>>(&buffer).unwrap();
+                pool.spawn_fn(move || {
+                    let sum = nums.iter().fold(0, |sum, val| sum + val);
+                    future::ok(sum)
+                })
             })
-        })
-        .and_then(move |sum| {
-            // delay should represent a database query
-            let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
-            sleep.map_err(|_| unimplemented!()).map(move |_| sum)
-        })
-        .map(|sum| {
-            let res = Response::default().with_body(format!("Sum: {}", sum));
-            res
-        });
+            .and_then(move |sum| {
+                // delay should represent a database query
+                let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
+                sleep.map_err(|_| unimplemented!()).map(move |_| sum)
+            })
+            .map(|sum| {
+                let res = Response::default().with_body(format!("Sum: {}", sum));
+                res
+            });
 
         Box::new(result)
     }
