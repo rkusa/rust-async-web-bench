@@ -55,7 +55,7 @@ impl Service for App
 
     fn call(&self, req: Self::Request) -> Self::Future {
         let pool = self.pool.clone();
-        let timer = self.timer.clone();
+        let handle = self.handle.clone();
         let result = req.body().concat2().map_err(|_| unimplemented!())
         .and_then(move |buffer| {
             // some json deserialization
@@ -67,8 +67,7 @@ impl Service for App
         })
         .and_then(move |sum| {
             // delay should represent a database query
-            let sleep = timer.sleep(Duration::from_millis(20));
-
+            let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
             sleep.map_err(|_| unimplemented!()).map(move |_| sum)
         })
         .map(|sum| {
