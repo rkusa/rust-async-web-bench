@@ -62,18 +62,15 @@ As expected, the total time is bound to the toal amount of requests multiplied w
 | async2 | 32 | 100.6814 | 99.3232 |
 | async2 | 100 | 101.3967 | 98.6225 |
 
-
-**Note:** The benchmark results from here on are not yer updated according to [PR#1](https://github.com/rkusa/rust-async-web-bench/pull/1).
-
 **3.5 GHz Intel Core i5-6600K (4 cores, 4 threads; Win10); 20ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
-| sync | 32 | 1.1350 | 8810.4345 |
-| sync | 100 |  1.0538 | 9489.4406 |
-| async1 | n/a | 0.8513 | 11747.2439 |
-| async2 | 32 | 1.5411 | 6488.8792 |
-| async2 | 100 | 0.9926 | 10074.4187 |
+| sync | 32 | 6.5240 | 1532.8059 |
+| sync | 100 | 2.3283 | 4294.9657 |
+| async1 | n/a | 2.2577| 4429.2613 |
+| async2 | 32 | 3.3449 | 2989.6178 |
+| async2 | 100 | 2.2263 | 4491.7972 |
 
 **3.5 GHz Intel Core i5-6600K (4 cores, 4 threads; Win10); 200ms artifical delay**
 

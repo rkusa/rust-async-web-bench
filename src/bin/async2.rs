@@ -68,7 +68,7 @@ impl Service for App {
             })
             .and_then(move |sum| {
                 // delay should represent a database query
-                let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
+                let sleep = Timeout::new(Duration::from_millis(20), &handle).unwrap();
                 sleep.map_err(|_| unimplemented!()).map(move |_| sum)
             })
             .map(|sum| {

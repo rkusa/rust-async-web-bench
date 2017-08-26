@@ -51,7 +51,7 @@ impl Service for App {
                 let sum = nums.iter().fold(0, |sum, val| sum + val);
 
                 // delay should represent a database query
-                let sleep = Timeout::new(Duration::from_millis(200), &handle).unwrap();
+                let sleep = Timeout::new(Duration::from_millis(20), &handle).unwrap();
                 sleep.map_err(|_| unimplemented!()).map(move |_| {
                     let res = Response::default().with_body(format!("Sum: {}", sum));
                     res
