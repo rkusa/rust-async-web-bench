@@ -30,7 +30,7 @@ hey -m POST -T 'application/json' -d '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 
 (Rust 1.21.0-nightly)
 
-**2.9 GHz Intel Core i5 (2 physical cores; macOS); 20ms artifical delay**
+**2.9 GHz Intel Core i5 (2 cores, 4 threads; macOS); 20ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
@@ -40,7 +40,7 @@ hey -m POST -T 'application/json' -d '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 | async2 | 32 | 2.9412 | 3400.0179 |
 | async2 | 100 | 2.7965 | 3575.8626 |
 
-**2.9 GHz Intel Core i5 (2 physical cores; macOS); 200ms artifical delay**
+**2.9 GHz Intel Core i5 (2 cores, 4 threads; macOS); 200ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ hey -m POST -T 'application/json' -d '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 | async2 | 32 | 20.7229 | 482.5580 |
 | async2 | 100 | 20.7803 | 481.2247 |
 
-**2.9 GHz Intel Core i5 (2 physical cores; macOS); 1000ms artifical delay**
+**2.9 GHz Intel Core i5 (2 cores, 4 threads; macOS); 1000ms artifical delay**
 
 As expected, the total time is bound to the toal amount of requests multiplied with the 1s artifical delay. Except in the `sync` example, when we have less threads in the thread pool than concurrent requests. The `async` case will probably always take `requests count * delay` seconds, regardless of the amount of concurrent requests.
 
@@ -65,7 +65,7 @@ As expected, the total time is bound to the toal amount of requests multiplied w
 
 **Note:** The benchmark results from here on are not yer updated according to [PR#1](https://github.com/rkusa/rust-async-web-bench/pull/1).
 
-**3.5 GHz Intel Core i5-6600K (4 physical cores; Win10); 20ms artifical delay**
+**3.5 GHz Intel Core i5-6600K (4 cores, 4 threads; Win10); 20ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
@@ -75,7 +75,7 @@ As expected, the total time is bound to the toal amount of requests multiplied w
 | async2 | 32 | 1.5411 | 6488.8792 |
 | async2 | 100 | 0.9926 | 10074.4187 |
 
-**3.5 GHz Intel Core i5-6600K (4 physical cores; Win10); 200ms artifical delay**
+**3.5 GHz Intel Core i5-6600K (4 cores, 4 threads; Win10); 200ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
@@ -87,14 +87,14 @@ As expected, the total time is bound to the toal amount of requests multiplied w
 
 ---
 
-The following tests are a little bit more computation intensive due to a more data to be deserialized and processed.
+The following tests are a little bit more computation intensive due to more data being deserialized and processed.
 
 ```bash
 hey -m POST -T 'application/json' -D payload-500kb.json -n 10000 -c 100 http://127.0.0.1:3000/
 ```
 
 
-**2.9 GHz Intel Core i5 (2 physical cores; macOS); 20ms artifical delay**
+**2.9 GHz Intel Core i5 (2 cores, 4 threads; macOS); 20ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
@@ -107,7 +107,7 @@ hey -m POST -T 'application/json' -D payload-500kb.json -n 10000 -c 100 http://1
 | async2 | 32 | 151.3932 | 66.0532 |
 | async2 | 100 | 152.5616 | 65.5473 |
 
-**2.9 GHz Intel Core i5 (2 physical cores; macOS); 200ms artifical delay**
+**2.9 GHz Intel Core i5 (2 cores, 4 threads; macOS); 200ms artifical delay**
 
 | Bench | Pool Size | Total time in sec | Requests/sec |
 | --- | --- | --- | --- |
